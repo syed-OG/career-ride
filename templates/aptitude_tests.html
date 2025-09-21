@@ -1,0 +1,146 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="page-header" style="background: var(--gradient-primary);">
+    <div class="container">
+        <h1 class="page-title"><i class="fas fa-brain me-2"></i> Aptitude Tests</h1>
+        <p class="page-subtitle">Assess your abilities and discover your strengths in different areas.</p>
+        <a href="{{ url_for('dashboard') }}" class="back-button mt-3">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <!-- Available Tests -->
+        <div class="col-lg-6 mb-4">
+            <div class="card animate-fade-in">
+                <div class="card-header">
+                    <i class="fas fa-list"></i> Available Tests
+                </div>
+                <div class="card-body">
+                    <p class="card-text mb-4">
+                        Select a test category from the options below to assess your skills in that area.
+                    </p>
+                    
+                    <div class="list-group">
+                        {% for test in tests %}
+                            <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="d-flex align-items-center">
+                                        {% if 'logical' in test.category.lower() %}
+                                            <i class="fas fa-puzzle-piece text-primary me-3 fa-2x"></i>
+                                        {% elif 'verbal' in test.category.lower() %}
+                                            <i class="fas fa-comment-alt text-danger me-3 fa-2x"></i>
+                                        {% elif 'quantitative' in test.category.lower() %}
+                                            <i class="fas fa-calculator text-warning me-3 fa-2x"></i>
+                                        {% else %}
+                                            <i class="fas fa-tools text-info me-3 fa-2x"></i>
+                                        {% endif %}
+                                        
+                                        <div>
+                                            <h5 class="mb-1">{{ test.category }}</h5>
+                                            <p class="mb-1 text-muted">{{ test.description }}</p>
+                                            <small>
+                                                <i class="fas fa-question-circle me-1"></i> {{ test.total_questions }} questions
+                                                {% if test.time_limit %}
+                                                    <span class="ms-2"><i class="fas fa-clock me-1"></i> {{ test.time_limit }} minutes</span>
+                                                {% else %}
+                                                    <span class="ms-2"><i class="fas fa-clock me-1"></i> No time limit</span>
+                                                {% endif %}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    {% if test.id in user_results %}
+                                        <span class="badge bg-success mb-2 d-block">
+                                            {{ user_results[test.id].score_percentage|round(1) }}%
+                                        </span>
+                                        <a href="{{ url_for('test_results', result_id=user_results[test.id].id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-chart-bar me-1"></i> Results
+                                        </a>
+                                        <a href="{{ url_for('take_test', test_id=test.id) }}" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-redo me-1"></i> Retake
+                                        </a>
+                                    {% else %}
+                                        <span class="badge bg-secondary mb-2 d-block">Not taken</span>
+                                        <a href="{{ url_for('take_test', test_id=test.id) }}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-play me-1"></i> Start Test
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="alert alert-info mt-4">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Tip:</strong> Each test contains multiple-choice questions. You can retake tests to improve your scores.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Your Test Results -->
+        <div class="col-lg-6">
+            <div class="card animate-fade-in">
+                <div class="card-header">
+                    <i class="fas fa-chart-line"></i> Your Test Results
+                </div>
+                <div class="card-body">
+                    {% if user_results %}
+                        <div class="mb-4" style="height: 300px;">
+                            <canvas id="aptitudeResultsChart" 
+                                    data-categories='{{ user_results|map(attribute="test.category")|list|tojson }}'
+                                    data-scores='{{ user_results|map(attribute="score")|list|tojson }}'
+                                    data-max-scores='{{ user_results|map(attribute="test.total_questions")|list|tojson }}'></canvas>
+                        </div>
+                        
+                        <h5 class="mb-3">Recent Tests</h5>
+                        <div class="list-group">
+                            {% for result in user_results.values()|sort(attribute='completed_at', reverse=True)|list %}
+                                <a href="{{ url_for('test_results', result_id=result.id) }}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ result.test.category }}</h6>
+                                            <small class="text-muted">
+                                                Completed on {{ result.completed_at.strftime('%b %d, %Y') }}
+                                            </small>
+                                        </div>
+                                        <div class="text-end">
+                                            <h5 class="mb-0 test-score">{{ result.score }}/{{ result.test.total_questions }}</h5>
+                                            <small class="text-muted">{{ result.score_percentage|round(1) }}%</small>
+                                        </div>
+                                    </div>
+                                    <div class="progress mt-2" style="height: 5px;">
+                                        <div class="progress-bar 
+                                            {% if result.score_percentage >= 80 %}bg-success
+                                            {% elif result.score_percentage >= 60 %}bg-primary
+                                            {% elif result.score_percentage >= 40 %}bg-warning
+                                            {% else %}bg-danger{% endif %}" 
+                                             role="progressbar" style="width: {{ result.score_percentage }}%"></div>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-brain fa-4x text-muted"></i>
+                            </div>
+                            <h5>No tests completed yet</h5>
+                            <p class="text-muted mb-4">Take your first aptitude test to assess your skills and see your results here.</p>
+                            <a href="#" class="btn btn-primary">
+                                <i class="fas fa-play me-2"></i> Start with Logical Reasoning
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

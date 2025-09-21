@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1 class="page-title">Career Paths</h1>
+        <p class="page-subtitle">Explore potential career paths and find your best fit</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card animate-fade-in">
+                <div class="card-body">
+                    <h5 class="card-title">Find Your Career Match</h5>
+                    <p class="card-text">
+                        Browse through various career paths to find your best match based on your skills and interests.
+                        Each career path includes required skills, recommended courses, and job outlook information.
+                    </p>
+                    
+                    {% if not current_user.profile or not current_user.profile.skills %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Add your skills in your profile to see personalized match scores for each career path.
+                            <a href="{{ url_for('profile') }}" class="alert-link">Update Profile</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        {% for path in career_paths %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card career-path-card animate-fade-in h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ path.name }}</h5>
+                        
+                        {% if path.id in match_scores %}
+                            <div class="text-center my-3">
+                                <div style="position: relative; width: 100px; height: 100px; margin: 0 auto;">
+                                    <canvas class="career-match-chart" data-score="{{ match_scores[path.id]|round|int }}"></canvas>
+                                </div>
+                                <p class="mt-2 mb-0">Match Score</p>
+                            </div>
+                        {% endif %}
+                        
+                        <p class="card-text">{{ path.description }}</p>
+                        
+                        <h6 class="mt-3">Required Skills:</h6>
+                        <p>
+                            {% for skill in path.required_skills.split(',') %}
+                                <span class="badge bg-primary m-1">{{ skill.strip() }}</span>
+                            {% endfor %}
+                        </p>
+                        
+                        <h6>Recommended Courses:</h6>
+                        <p>{{ path.recommended_courses }}</p>
+                        
+                        <h6>Job Outlook:</h6>
+                        <p>{{ path.job_outlook }}</p>
+                    </div>
+                    <div class="card-footer bg-white border-top-0">
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('new_career_goal', path_id=path.id) }}" class="btn btn-outline-primary">
+                                <i class="fas fa-bullseye me-2"></i> Set as Career Goal
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

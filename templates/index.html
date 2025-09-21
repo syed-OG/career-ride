@@ -1,0 +1,257 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 animate-fade-in">
+                <h1 class="hero-title">Navigate Your Academic Journey with Career Compass</h1>
+                <p class="hero-text">
+                    Make informed course selections, explore career paths, and develop essential skills with our AI-powered guidance platform.
+                </p>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg">
+                        <i class="fas fa-tachometer-alt me-2"></i> Go to Dashboard
+                    </a>
+                {% else %}
+                    <div>
+                        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg me-3">
+                            <i class="fas fa-user-plus me-2"></i> Get Started
+                        </a>
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i> Login
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-lg-6 d-none d-lg-block">
+                <div class="text-center">
+                    <svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="200" cy="200" r="180" fill="#8a5cf7" opacity="0.1" />
+                        <circle cx="200" cy="200" r="150" fill="#8a5cf7" opacity="0.2" />
+                        <circle cx="200" cy="200" r="120" fill="#8a5cf7" opacity="0.3" />
+                        <circle cx="200" cy="200" r="90" fill="#8a5cf7" opacity="0.4" />
+                        <circle cx="200" cy="200" r="60" fill="#6f42c1" />
+                        <path d="M200 170 L200 230" stroke="#fff" stroke-width="8" stroke-linecap="round" />
+                        <path d="M170 200 L230 200" stroke="#fff" stroke-width="8" stroke-linecap="round" />
+                        <!-- North point -->
+                        <path d="M200 120 L200 90" stroke="#fff" stroke-width="5" stroke-linecap="round" />
+                        <path d="M195 95 L200 80 L205 95" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+                        <!-- East point -->
+                        <path d="M280 200 L310 200" stroke="#fff" stroke-width="5" stroke-linecap="round" />
+                        <path d="M305 195 L320 200 L305 205" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+                        <!-- South point -->
+                        <path d="M200 280 L200 310" stroke="#fff" stroke-width="5" stroke-linecap="round" />
+                        <path d="M195 305 L200 320 L205 305" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+                        <!-- West point -->
+                        <path d="M120 200 L90 200" stroke="#fff" stroke-width="5" stroke-linecap="round" />
+                        <path d="M95 195 L80 200 L95 205" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <h2 class="text-center mb-5">How Career Compass Helps You</h2>
+    
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body">
+                    <div class="feature-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="feature-title">Personalized Course Recommendations</h3>
+                    <p>
+                        Our AI-powered system analyzes your skills, interests, and career goals to suggest the most relevant courses for your academic journey.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body">
+                    <div class="feature-icon">
+                        <i class="fas fa-road"></i>
+                    </div>
+                    <h3 class="feature-title">Career Path Exploration</h3>
+                    <p>
+                        Discover various career paths, understand required skills, and see how well your current profile matches with potential careers.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body">
+                    <div class="feature-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3 class="feature-title">Skill Development</h3>
+                    <p>
+                        Practice coding, take aptitude tests, and develop essential skills needed for your desired career with our interactive platform.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-md-4 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3 class="feature-title">AI Career Advisor</h3>
+                    <p>
+                        Get personalized advice from our AI Career Advisor on course selection, skill development, and career planning.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="feature-title">Progress Tracking</h3>
+                    <p>
+                        Monitor your academic progress, skill development, and career readiness with intuitive dashboards and visualizations.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body">
+                    <div class="feature-icon">
+                        <i class="fas fa-map"></i>
+                    </div>
+                    <h3 class="feature-title">Developer Roadmaps</h3>
+                    <p>
+                        Follow structured learning paths for different tech roles with our comprehensive developer roadmaps.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h2>Join Career Compass Today</h2>
+                <p class="lead mb-4">
+                    Start your journey to a successful career with personalized guidance and skill development.
+                </p>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-primary me-2"></i>
+                        Create a personalized academic profile
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-primary me-2"></i>
+                        Get AI-powered course recommendations
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-primary me-2"></i>
+                        Practice coding and take aptitude tests
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-primary me-2"></i>
+                        Explore career paths matching your skills
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-primary me-2"></i>
+                        Track your progress with visual dashboards
+                    </li>
+                </ul>
+                {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg mt-3">
+                    <i class="fas fa-user-plus me-2"></i> Sign Up Now
+                </a>
+                {% else %}
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg mt-3">
+                    <i class="fas fa-tachometer-alt me-2"></i> Go to Dashboard
+                </a>
+                {% endif %}
+            </div>
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                <div class="carousel-item active">
+                                    <div class="p-4">
+                                        <p class="lead fst-italic mb-3">
+                                            "Career Compass helped me discover my passion for data science and guided me through the courses I needed to take. Now I'm working as a Data Analyst at a top tech company!"
+                                        </p>
+                                        <div class="d-flex align-items-center">
+                                            <div class="text-primary me-3">
+                                                <i class="fas fa-user-circle fa-2x"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="mb-0">Sarah Johnson</h5>
+                                                <p class="mb-0 text-muted">Computer Science Graduate</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="carousel-item">
+                                    <div class="p-4">
+                                        <p class="lead fst-italic mb-3">
+                                            "The coding practice platform and aptitude tests helped me prepare for technical interviews. I landed my dream job as a Software Engineer thanks to Career Compass!"
+                                        </p>
+                                        <div class="d-flex align-items-center">
+                                            <div class="text-primary me-3">
+                                                <i class="fas fa-user-circle fa-2x"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="mb-0">Michael Chen</h5>
+                                                <p class="mb-0 text-muted">Full Stack Developer</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="carousel-item">
+                                    <div class="p-4">
+                                        <p class="lead fst-italic mb-3">
+                                            "I was unsure about which career path to follow. The AI Advisor helped me identify my strengths and find a perfect match in UX Design. Best decision ever!"
+                                        </p>
+                                        <div class="d-flex align-items-center">
+                                            <div class="text-primary me-3">
+                                                <i class="fas fa-user-circle fa-2x"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="mb-0">Priya Sharma</h5>
+                                                <p class="mb-0 text-muted">UX Designer</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

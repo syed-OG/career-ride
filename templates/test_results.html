@@ -1,0 +1,160 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1 class="page-title"><i class="fas fa-chart-bar me-2"></i> Test Results</h1>
+        <p class="page-subtitle">{{ test.category }} - Completed on {{ result.completed_at.strftime('%B %d, %Y') }}</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <!-- Results Summary -->
+        <div class="col-lg-4 mb-4">
+            <div class="card animate-fade-in">
+                <div class="card-header">
+                    <i class="fas fa-trophy"></i> Your Result
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-4 position-relative d-inline-block">
+                        <svg width="180" height="180" viewBox="0 0 36 36">
+                            <path d="M18 2.0845
+                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                  fill="none" stroke="#eeeeee" stroke-width="3" />
+                            <path d="M18 2.0845
+                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                  fill="none" stroke="{{ 'var(--success)' if result.score_percentage >= 60 else 'var(--warning)' if result.score_percentage >= 40 else 'var(--danger)' }}" 
+                                  stroke-width="3" 
+                                  stroke-dasharray="{{ result.score_percentage }}, 100" />
+                            <text x="18" y="20.35" class="percentage" text-anchor="middle" 
+                                  style="font-size: 8px; font-weight: bold; fill: {{ 'var(--success)' if result.score_percentage >= 60 else 'var(--warning)' if result.score_percentage >= 40 else 'var(--danger)' }};">
+                                {{ result.score_percentage|round|int }}%
+                            </text>
+                        </svg>
+                        <div class="text-center mt-2">
+                            <h2 class="mb-0">{{ result.score }}/{{ test.total_questions }}</h2>
+                            <p class="text-muted">Score</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="alert alert-{{ 'success' if result.score_percentage >= test.passing_score else 'danger' }}">
+                            {% if result.score_percentage >= test.passing_score %}
+                                <i class="fas fa-check-circle me-2"></i> You passed!
+                            {% else %}
+                                <i class="fas fa-times-circle me-2"></i> Not passed
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <div class="bg-light p-3 rounded">
+                                <h6 class="mb-1">Time Taken</h6>
+                                <p class="mb-0 fs-5">
+                                    {{ (result.time_taken // 60)|int }}m {{ result.time_taken % 60 }}s
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-light p-3 rounded">
+                                <h6 class="mb-1">Passing Score</h6>
+                                <p class="mb-0 fs-5">{{ test.passing_score }}%</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('take_test', test_id=test.id) }}" class="btn btn-primary">
+                            <i class="fas fa-redo me-2"></i> Retake Test
+                        </a>
+                        <a href="{{ url_for('aptitude_tests') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-chevron-left me-2"></i> Back to All Tests
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4 animate-fade-in">
+                <div class="card-header">
+                    <i class="fas fa-lightbulb"></i> Room for improvement
+                </div>
+                <div class="card-body">
+                    <p>
+                        Based on your performance, here are some areas to focus on:
+                    </p>
+                    <ul>
+                        <li><strong>Deductive Reasoning:</strong> Improve your ability to draw logical conclusions from given premises.</li>
+                        <li><strong>Pattern Recognition:</strong> Practice identifying patterns in sequences and relationships.</li>
+                        <li><strong>Critical Thinking:</strong> Work on analyzing problems from multiple perspectives.</li>
+                    </ul>
+                    <p class="mb-0">
+                        <i class="fas fa-book text-primary me-2"></i>
+                        <strong>Recommended resources:</strong> "Critical Thinking Skills" course, "Logic Puzzles for Beginners" e-book
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Question Review -->
+        <div class="col-lg-8">
+            <div class="card animate-fade-in">
+                <div class="card-header">
+                    <i class="fas fa-list-ol"></i> Question Review
+                </div>
+                <div class="card-body">
+                    {% for question in questions %}
+                        {% set user_answer = answers.get(question.id|string, -1)|int %}
+                        {% set options = question.options|tojson|fromjson %}
+                        
+                        <div class="question-review mb-4 p-3 {% if user_answer == question.correct_option %}bg-success bg-opacity-10{% else %}bg-danger bg-opacity-10{% endif %} rounded">
+                            <div class="mb-3">
+                                <strong>Question {{ loop.index }}:</strong> {{ question.question_text }}
+                            </div>
+                            
+                            <div class="options-review">
+                                {% for option in options %}
+                                    <div class="d-flex align-items-center mb-2 p-2 rounded
+                                        {% if loop.index0 == question.correct_option %}bg-success bg-opacity-25
+                                        {% elif loop.index0 == user_answer and loop.index0 != question.correct_option %}bg-danger bg-opacity-25
+                                        {% endif %}">
+                                        <div class="me-3">
+                                            {% if loop.index0 == question.correct_option %}
+                                                <i class="fas fa-check-circle text-success fa-lg"></i>
+                                            {% elif loop.index0 == user_answer and loop.index0 != question.correct_option %}
+                                                <i class="fas fa-times-circle text-danger fa-lg"></i>
+                                            {% else %}
+                                                <i class="far fa-circle text-muted fa-lg"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            {{ loop.index }}. {{ option }}
+                                            {% if loop.index0 == user_answer %}
+                                                <span class="ms-2 small">(Your answer)</span>
+                                            {% endif %}
+                                            {% if loop.index0 == question.correct_option %}
+                                                <span class="ms-2 small">(Correct answer)</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            
+                            {% if question.explanation %}
+                                <div class="explanation mt-3 p-3 bg-light rounded">
+                                    <strong>Explanation:</strong> {{ question.explanation }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        {% if not loop.last %}<hr>{% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

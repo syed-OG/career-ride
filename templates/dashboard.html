@@ -1,0 +1,261 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1 class="page-title">Welcome, {{ current_user.first_name if current_user.first_name else current_user.username }}</h1>
+        <p class="page-subtitle">Track your progress, view recommendations, and manage your career goals</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <!-- Main Dashboard Content -->
+        <div class="col-lg-8">
+            <!-- Academic Progress -->
+            <div class="card mb-4 animate-fade-in">
+                <div class="card-header">
+                    <i class="fas fa-chart-line"></i> Academic Progress
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <div class="stats-icon">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <div class="stats-value">{{ profile.gpa if profile and profile.gpa else '-.-' }}</div>
+                                <div class="stats-label">Current GPA</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <div class="stats-icon">
+                                    <i class="fas fa-certificate"></i>
+                                </div>
+                                <div class="stats-value">{{ profile.credits_completed if profile and profile.credits_completed else '0' }}</div>
+                                <div class="stats-label">Credits Completed</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <div class="stats-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div class="stats-value">{{ profile.graduation_year if profile and profile.graduation_year else '----' }}</div>
+                                <div class="stats-label">Graduation Year</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress Chart -->
+                    <div style="height: 250px;">
+                        <canvas id="progressChart" 
+                                data-labels='["Jan", "Feb", "Mar", "Apr", "May", "Jun"]' 
+                                data-values='[20, 35, 42, 50, 65, 70]'></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Career Goals -->
+            <div class="card mb-4 animate-fade-in">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-bullseye"></i> Career Goals
+                    </div>
+                    <a href="{{ url_for('new_career_goal') }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus"></i> Add Goal
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if career_goals %}
+                        {% for goal in career_goals %}
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="mb-0">
+                                    {% if goal.career_path %}
+                                        {{ goal.career_path.name }}
+                                    {% else %}
+                                        {{ goal.custom_title }}
+                                    {% endif %}
+                                </h5>
+                                <a href="{{ url_for('update_career_goal', goal_id=goal.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </div>
+                            
+                            <p class="text-muted mb-2">
+                                {% if goal.target_date %}
+                                    Target Date: {{ goal.target_date.strftime('%b %d, %Y') }}
+                                {% endif %}
+                            </p>
+                            
+                            {% if goal.description %}
+                                <p class="mb-2">{{ goal.description }}</p>
+                            {% endif %}
+                            
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar" id="progress-bar-{{ goal.id }}" 
+                                     role="progressbar" style="width: {{ goal.progress }}%;" 
+                                     aria-valuenow="{{ goal.progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-1">
+                                <small>Progress</small>
+                                <small id="progress-text-{{ goal.id }}">{{ goal.progress }}%</small>
+                            </div>
+                            
+                            <div class="mt-2">
+                                <label for="progress-{{ goal.id }}" class="form-label">Update Progress:</label>
+                                <input type="range" class="form-range progress-input" 
+                                       id="progress-{{ goal.id }}" 
+                                       data-goal-id="{{ goal.id }}"
+                                       min="0" max="100" step="5" value="{{ goal.progress }}">
+                            </div>
+                        </div>
+                        {% if not loop.last %}<hr>{% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <div class="mb-3">
+                                <i class="fas fa-bullseye fa-3x text-muted"></i>
+                            </div>
+                            <h5>No career goals set</h5>
+                            <p class="text-muted mb-3">Define your career goals to track your progress</p>
+                            <a href="{{ url_for('new_career_goal') }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i> Add Your First Goal
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="card mb-4 animate-fade-in">
+                <div class="card-header">
+                    <i class="fas fa-history"></i> Recent Activity
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% if coding_solutions %}
+                            {% for solution in coding_solutions %}
+                                <li class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <i class="fas fa-code text-primary me-2"></i>
+                                            <span>Submitted solution to <strong>{{ solution.problem.title }}</strong></span>
+                                        </div>
+                                        <span class="badge {% if solution.status == 'Accepted' %}bg-success{% else %}bg-warning{% endif %}">
+                                            {{ solution.status }}
+                                        </span>
+                                    </div>
+                                    <small class="text-muted">{{ solution.submitted_at.strftime('%b %d, %Y at %I:%M %p') }}</small>
+                                </li>
+                            {% endfor %}
+                        {% endif %}
+                        
+                        {% if test_results %}
+                            {% for result in test_results %}
+                                <li class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <i class="fas fa-brain text-primary me-2"></i>
+                                            <span>Completed <strong>{{ result.test.category }}</strong> test</span>
+                                        </div>
+                                        <span class="badge bg-primary">{{ result.score_percentage|round(1) }}%</span>
+                                    </div>
+                                    <small class="text-muted">{{ result.completed_at.strftime('%b %d, %Y at %I:%M %p') }}</small>
+                                </li>
+                            {% endfor %}
+                        {% endif %}
+                        
+                        {% if not coding_solutions and not test_results %}
+                            <li class="list-group-item px-0 text-center py-4">
+                                <i class="fas fa-clipboard-list fa-2x text-muted mb-3"></i>
+                                <p>No recent activity to display</p>
+                                <div class="mt-3">
+                                    <a href="{{ url_for('coding_practice') }}" class="btn btn-sm btn-outline-primary me-2">
+                                        <i class="fas fa-code me-1"></i> Try Coding Practice
+                                    </a>
+                                    <a href="{{ url_for('aptitude_tests') }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-brain me-1"></i> Take an Aptitude Test
+                                    </a>
+                                </div>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar Content -->
+        <div class="col-lg-4">
+            <!-- Profile Card -->
+            <div class="card mb-4 animate-fade-in">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-user-circle fa-5x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">{{ current_user.first_name }} {{ current_user.last_name }}</h5>
+                    <p class="text-muted">{{ current_user.major if current_user.major else 'Set your major in profile' }}</p>
+                    <p class="text-muted">{{ current_user.institution if current_user.institution else 'Set your institution in profile' }}</p>
+                    
+                    {% if profile and profile.skills %}
+                        <div class="mt-3">
+                            <h6>Skills</h6>
+                            <div>
+                                {% for skill in profile.skills.split(',') %}
+                                    <span class="badge bg-primary m-1">{{ skill.strip() }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mt-3">
+                        <a href="{{ url_for('profile') }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-edit me-1"></i> Edit Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Course Completion -->
+            <div class="card mb-4 animate-fade-in">
+                <div class="card-header">
+                    <i class="fas fa-book"></i> Course Completion
+                </div>
+                <div class="card-body text-center">
+                    <div style="height: 200px;">
+                        <canvas id="courseCompletionChart" 
+                                data-completed="5" 
+                                data-in-progress="3" 
+                                data-planned="7"></canvas>
+                    </div>
+                    <div class="mt-3">
+                        <a href="{{ url_for('courses') }}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-book me-1"></i> Browse Courses
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- AI Advisor Tip -->
+            <div class="card mb-4 animate-fade-in">
+                <div class="card-header">
+                    <i class="fas fa-robot"></i> AI Advisor Tip
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>
+                        Based on your career goals and current progress, consider taking courses in Data Structures and Algorithms to strengthen your foundation.
+                    </p>
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('ai_advisor') }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-comments me-1"></i> Chat with AI Advisor
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

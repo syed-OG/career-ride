@@ -1,0 +1,167 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1 class="page-title"><i class="fas fa-code me-2"></i> Coding Practice</h1>
+        <p class="page-subtitle">Improve your programming skills with hands-on coding challenges.</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <!-- Filters -->
+        <div class="col-lg-3 mb-4">
+            <div class="card animate-fade-in">
+                <div class="card-header">
+                    <i class="fas fa-filter"></i> Filter Problems
+                </div>
+                <div class="card-body">
+                    <form id="filter-form" method="GET" action="{{ url_for('coding_practice') }}">
+                        <div class="mb-3">
+                            <label for="difficulty" class="form-label">Difficulty Level</label>
+                            <select class="form-select" id="difficulty" name="difficulty">
+                                <option value="">All Difficulties</option>
+                                <option value="Easy" {% if difficulty == 'Easy' %}selected{% endif %}>Easy</option>
+                                <option value="Medium" {% if difficulty == 'Medium' %}selected{% endif %}>Medium</option>
+                                <option value="Hard" {% if difficulty == 'Hard' %}selected{% endif %}>Hard</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="topic" class="form-label">Topic</label>
+                            <select class="form-select" id="topic" name="topic">
+                                <option value="">All Topics</option>
+                                <option value="Arrays" {% if topic == 'Arrays' %}selected{% endif %}>Arrays</option>
+                                <option value="Strings" {% if topic == 'Strings' %}selected{% endif %}>Strings</option>
+                                <option value="Linked Lists" {% if topic == 'Linked Lists' %}selected{% endif %}>Linked Lists</option>
+                                <option value="Trees" {% if topic == 'Trees' %}selected{% endif %}>Trees</option>
+                                <option value="Sorting" {% if topic == 'Sorting' %}selected{% endif %}>Sorting</option>
+                                <option value="Dynamic Programming" {% if topic == 'Dynamic Programming' %}selected{% endif %}>Dynamic Programming</option>
+                                <option value="Graphs" {% if topic == 'Graphs' %}selected{% endif %}>Graphs</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="">All Problems</option>
+                                <option value="solved" {% if status == 'solved' %}selected{% endif %}>Solved</option>
+                                <option value="attempted" {% if status == 'attempted' %}selected{% endif %}>Attempted</option>
+                                <option value="unsolved" {% if status == 'unsolved' %}selected{% endif %}>Unsolved</option>
+                            </select>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-2"></i> Apply Filters
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4 animate-fade-in">
+                <div class="card-header">
+                    <i class="fas fa-question-circle"></i> Why Practice Coding?
+                </div>
+                <div class="card-body">
+                    <p>Regular coding practice helps you:</p>
+                    <ul>
+                        <li>Strengthen problem-solving skills</li>
+                        <li>Prepare for technical interviews</li>
+                        <li>Improve algorithm knowledge</li>
+                        <li>Build confidence in programming</li>
+                        <li>Develop efficient coding habits</li>
+                    </ul>
+                    <p class="text-muted mt-2">
+                        <i class="fas fa-lightbulb me-1"></i> Tip: Try to solve at least one problem per day
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Problems List -->
+        <div class="col-lg-9">
+            <div class="card animate-fade-in">
+                <div class="card-header">
+                    <i class="fas fa-list"></i> Coding Problems
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="problem-search" placeholder="Search problems...">
+                            <button class="btn btn-primary" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    {% if problems %}
+                        {% for problem in problems %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="card-title mb-0">{{ problem.title }}</h5>
+                                        <a href="{{ url_for('view_problem', problem_id=problem.id) }}" class="btn btn-primary">
+                                            <i class="fas fa-code me-1"></i> Solve
+                                        </a>
+                                    </div>
+                                    
+                                    <div class="mb-2">
+                                        <span class="badge bg-{% if problem.difficulty == 'Easy' %}success{% elif problem.difficulty == 'Medium' %}warning{% else %}danger{% endif %} me-2">
+                                            {{ problem.difficulty }}
+                                        </span>
+                                        <span class="badge bg-secondary me-2">
+                                            Problem {{ problem.id }}
+                                        </span>
+                                        {% if problem.topic %}
+                                            <span class="badge bg-info">{{ problem.topic }}</span>
+                                        {% endif %}
+                                        
+                                        {% if problem.id in user_solutions %}
+                                            <span class="badge {% if user_solutions[problem.id].status == 'Accepted' %}bg-success{% else %}bg-warning{% endif %} ms-2">
+                                                {{ user_solutions[problem.id].status }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <p class="card-text">
+                                        {{ problem.description|truncate(150) }}
+                                    </p>
+                                    
+                                    <button class="btn btn-sm btn-outline-secondary show-example-btn" data-target="example-{{ problem.id }}">
+                                        <i class="fas fa-eye me-1"></i> Show Example
+                                    </button>
+                                    
+                                    <div id="example-{{ problem.id }}" style="display: none;" class="mt-3 bg-light p-3 rounded">
+                                        <div class="mb-2">
+                                            <strong>Input:</strong> {{ problem.example_input }}
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Output:</strong> {{ problem.example_output }}
+                                        </div>
+                                        <div class="explanation">
+                                            <strong>Explanation:</strong>
+                                            <p>Because nums[0] + nums[1] == 9, we return [0, 1].</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-code fa-3x text-muted mb-3"></i>
+                            <h5>No coding problems found</h5>
+                            <p class="text-muted">Try adjusting your filters or check back later for new problems</p>
+                            <a href="{{ url_for('coding_practice') }}" class="btn btn-primary mt-2">
+                                <i class="fas fa-sync-alt me-2"></i> Reset Filters
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

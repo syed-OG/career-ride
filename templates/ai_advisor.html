@@ -1,0 +1,175 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="page-header" style="background: var(--gradient-primary);">
+    <div class="container">
+        <h1 class="page-title"><i class="fas fa-robot me-2"></i> AI Career Advisor</h1>
+        <p class="page-subtitle">Get personalized guidance and answers to your career questions</p>
+        <a href="{{ url_for('dashboard') }}" class="back-button mt-3">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <!-- AI Advisor Info -->
+        <div class="col-lg-4 mb-4">
+            <div class="card animate-fade-in">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> About AI Advisor
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="#6f42c1" opacity="0.2" />
+                            <circle cx="50" cy="50" r="35" fill="#6f42c1" />
+                            <circle cx="35" cy="40" r="5" fill="white" />
+                            <circle cx="65" cy="40" r="5" fill="white" />
+                            <path d="M35 65 Q50 80 65 65" stroke="white" stroke-width="3" fill="none" />
+                            <path d="M25 30 L15 20" stroke="#6f42c1" stroke-width="3" />
+                            <path d="M75 30 L85 20" stroke="#6f42c1" stroke-width="3" />
+                            <path d="M25 90 A40 40 0 0 1 75 90" stroke="#6f42c1" stroke-width="3" fill="none" />
+                        </svg>
+                    </div>
+                    
+                    <h5 class="text-center mb-3">How Can I Help You?</h5>
+                    
+                    <p>Your AI Career Advisor can assist with:</p>
+                    <ul>
+                        <li>Course recommendations based on your career goals</li>
+                        <li>Guidance on skill development and learning paths</li>
+                        <li>Information about career opportunities and job market trends</li>
+                        <li>Advice on preparing for internships and job interviews</li>
+                        <li>Creating personalized study plans</li>
+                    </ul>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Tip:</strong> Be specific in your questions to get the most helpful responses. You can ask about specific fields, technologies, or skills.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4 animate-fade-in gradient-card accent-card">
+                <div class="card-header bg-transparent border-bottom-0">
+                    <i class="fas fa-question-circle"></i> Sample Questions
+                </div>
+                <div class="card-body">
+                    <div class="sample-question p-3 mb-3 rounded" style="background: linear-gradient(135deg, rgba(74, 0, 224, 0.05), rgba(124, 77, 255, 0.1)); border-left: 3px solid var(--primary); cursor: pointer; transition: all 0.3s ease;">
+                        <i class="fas fa-laptop-code text-primary me-2"></i> What courses should I take to become a frontend developer?
+                    </div>
+                    <div class="sample-question p-3 mb-3 rounded" style="background: linear-gradient(135deg, rgba(0, 229, 255, 0.05), rgba(0, 229, 255, 0.1)); border-left: 3px solid var(--accent); cursor: pointer; transition: all 0.3s ease;">
+                        <i class="fas fa-chart-bar text-info me-2"></i> What skills are most important for a data scientist?
+                    </div>
+                    <div class="sample-question p-3 mb-3 rounded" style="background: linear-gradient(135deg, rgba(255, 42, 117, 0.05), rgba(255, 42, 117, 0.1)); border-left: 3px solid var(--secondary); cursor: pointer; transition: all 0.3s ease;">
+                        <i class="fas fa-code-branch text-secondary me-2"></i> How can I prepare for a software engineering internship?
+                    </div>
+                    <div class="sample-question p-3 mb-3 rounded" style="background: linear-gradient(135deg, rgba(68, 214, 44, 0.05), rgba(68, 214, 44, 0.1)); border-left: 3px solid var(--accent2); cursor: pointer; transition: all 0.3s ease;">
+                        <i class="fas fa-robot text-success me-2"></i> What's the career outlook for AI engineers?
+                    </div>
+                    <div class="sample-question p-3 rounded" style="background: linear-gradient(135deg, rgba(255, 145, 0, 0.05), rgba(255, 145, 0, 0.1)); border-left: 3px solid var(--accent3); cursor: pointer; transition: all 0.3s ease;">
+                        <i class="fas fa-server text-warning me-2"></i> What programming languages should I learn for backend development?
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat Interface -->
+        <div class="col-lg-8">
+            <div class="card animate-fade-in gradient-card primary-card">
+                <div class="card-header bg-transparent border-bottom-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-comments"></i> Chat with AI Career Advisor
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary" id="clear-chat">
+                            <i class="fas fa-eraser me-1"></i> Clear Chat
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chat-container mb-3" style="background: rgba(255, 255, 255, 0.7); border-radius: var(--border-radius); border: 1px solid rgba(74, 0, 224, 0.1); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);">
+                        {% if not messages %}
+                            <div class="chat-message ai-message">
+                                <div class="avatar-container">
+                                    <div class="avatar ai-avatar">
+                                        <i class="fas fa-robot"></i>
+                                    </div>
+                                </div>
+                                <div class="message-bubble">
+                                    <p>Hello! I'm your AI Career Advisor. How can I help you with your academic and career planning today?</p>
+                                    <div class="chat-time">Just now</div>
+                                </div>
+                            </div>
+                        {% else %}
+                            {% for message in messages %}
+                                <div class="chat-message {{ 'user-message' if message.is_user else 'ai-message' }}">
+                                    <div class="avatar-container">
+                                        <div class="avatar {{ 'user-avatar' if message.is_user else 'ai-avatar' }}">
+                                            <i class="{{ 'fas fa-user' if message.is_user else 'fas fa-robot' }}"></i>
+                                        </div>
+                                    </div>
+                                    <div class="message-bubble">
+                                        <p>{{ message.message }}</p>
+                                        <div class="chat-time">{{ message.created_at.strftime('%I:%M %p') }}</div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <form method="POST" action="{{ url_for('ai_advisor') }}" class="message-form">
+                        {{ form.hidden_tag() }}
+                        <div class="input-group" style="box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); border-radius: var(--border-radius); overflow: hidden;">
+                            {{ form.message(class="form-control", placeholder="Type your question here...", rows=2, style="border: 1px solid rgba(74, 0, 224, 0.2); border-right: none;") }}
+                            <button type="submit" class="btn btn-primary" style="background: var(--gradient-primary); border: none;">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        {% if form.message.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.message.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add sample questions to chat input when clicked
+        const sampleQuestions = document.querySelectorAll('.sample-question');
+        const messageInput = document.querySelector('#message');
+        
+        sampleQuestions.forEach(question => {
+            question.addEventListener('click', function() {
+                messageInput.value = this.textContent.trim();
+                messageInput.focus();
+            });
+        });
+        
+        // Clear chat functionality
+        const clearChatBtn = document.querySelector('#clear-chat');
+        const chatContainer = document.querySelector('.chat-container');
+        
+        if (clearChatBtn) {
+            clearChatBtn.addEventListener('click', function() {
+                // We'll just refresh the page for now, in a real implementation
+                // this would make an AJAX call to clear the chat history
+                if (confirm('Are you sure you want to clear the chat history?')) {
+                    window.location.reload();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+{% endblock %}

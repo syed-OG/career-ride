@@ -1,0 +1,457 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="page-header" style="background: var(--gradient-primary);">
+    <div class="container">
+        <h1 class="page-title">Your Profile</h1>
+        <p class="page-subtitle">Update your personal information and academic details</p>
+    </div>
+</div>
+
+<div class="container">
+    <a href="{{ url_for('dashboard') }}" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card animate-fade-in gradient-card">
+                <div class="card-body text-center">
+                    <div class="profile-picture-container mb-4">
+                        {% if current_user.profile and current_user.profile.profile_picture %}
+                            <img src="{{ current_user.profile.profile_picture }}" alt="Profile Picture" class="profile-picture">
+                        {% else %}
+                            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-user-circle fa-6x text-primary"></i>
+                            </div>
+                        {% endif %}
+                        <div class="profile-picture-upload">
+                            <i class="fas fa-camera"></i> Change Photo
+                        </div>
+                    </div>
+                    
+                    <h3 class="mb-2">{{ current_user.first_name or '' }} {{ current_user.last_name or '' }}</h3>
+                    <p class="mb-1"><span class="badge bg-primary">@{{ current_user.username }}</span></p>
+                    <p class="text-muted mb-3"><i class="fas fa-envelope me-2"></i>{{ current_user.email }}</p>
+                    
+                    {% if current_user.profile %}
+                        {% if current_user.profile.institution or current_user.profile.major %}
+                            <div class="profile-detail-item">
+                                <div class="profile-detail-icon">
+                                    <i class="fas fa-university"></i>
+                                </div>
+                                <div>
+                                    {{ current_user.profile.institution or 'Not specified' }} 
+                                    {% if current_user.profile.major %}
+                                        <span class="text-muted">| {{ current_user.profile.major }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if current_user.dob %}
+                            <div class="profile-detail-item">
+                                <div class="profile-detail-icon">
+                                    <i class="fas fa-birthday-cake"></i>
+                                </div>
+                                <div>
+                                    {{ current_user.dob.strftime('%B %d, %Y') if current_user.dob else 'Not specified' }}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                    
+                    {% if current_user.profile %}
+                        {% if current_user.profile.github_url or current_user.profile.linkedin_url or current_user.profile.portfolio_url or current_user.profile.twitter_url or current_user.profile.instagram_url %}
+                            <div class="mt-4">
+                                <div class="social-links">
+                                    {% if current_user.profile.github_url %}
+                                        <a href="{{ current_user.profile.github_url }}" target="_blank" rel="noopener" class="social-link">
+                                            <i class="fab fa-github"></i>
+                                        </a>
+                                    {% endif %}
+                                    
+                                    {% if current_user.profile.linkedin_url %}
+                                        <a href="{{ current_user.profile.linkedin_url }}" target="_blank" rel="noopener" class="social-link">
+                                            <i class="fab fa-linkedin-in"></i>
+                                        </a>
+                                    {% endif %}
+                                    
+                                    {% if current_user.profile.portfolio_url %}
+                                        <a href="{{ current_user.profile.portfolio_url }}" target="_blank" rel="noopener" class="social-link">
+                                            <i class="fas fa-globe"></i>
+                                        </a>
+                                    {% endif %}
+                                    
+                                    {% if current_user.profile.twitter_url %}
+                                        <a href="{{ current_user.profile.twitter_url }}" target="_blank" rel="noopener" class="social-link">
+                                            <i class="fab fa-twitter"></i>
+                                        </a>
+                                    {% endif %}
+                                    
+                                    {% if current_user.profile.instagram_url %}
+                                        <a href="{{ current_user.profile.instagram_url }}" target="_blank" rel="noopener" class="social-link">
+                                            <i class="fab fa-instagram"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if current_user.profile.skills %}
+                            <div class="mt-4">
+                                <h6 class="profile-section-title text-center">Key Skills</h6>
+                                <div class="d-flex flex-wrap justify-content-center">
+                                    {% for skill in current_user.profile.skills.split(',')[:5] %}
+                                        <span class="skill-badge">{{ skill.strip() }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if current_user.profile and current_user.profile.skills %}
+                <div class="card mt-4 animate-fade-in gradient-card">
+                    <div class="card-header bg-transparent border-bottom-0">
+                        <i class="fas fa-tools"></i> Skills Assessment
+                    </div>
+                    <div class="card-body">
+                        <canvas id="skillsRadarChart" 
+                                data-skills='["Programming", "Problem Solving", "Data Analysis", "Communication", "Teamwork"]'
+                                data-levels='[4, 3, 3.5, 4, 4.5]'></canvas>
+                    </div>
+                </div>
+                
+                <!-- Achievements Section -->
+                <div class="card mt-4 animate-fade-in gradient-card accent-card">
+                    <div class="card-header bg-transparent border-bottom-0">
+                        <i class="fas fa-trophy"></i> Achievements
+                    </div>
+                    <div class="card-body">
+                        {% if current_user.profile and current_user.profile.achievements %}
+                            {% set achievements = current_user.profile.achievements.split('\n') %}
+                            {% for achievement in achievements %}
+                                {% if achievement|trim %}
+                                    <div class="achievement-card mb-2">
+                                        <div class="achievement-badge">
+                                            <i class="fas fa-award"></i>
+                                        </div>
+                                        <h6 class="mb-0">{{ achievement }}</h6>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-3">
+                                <i class="fas fa-trophy fa-3x mb-3 text-muted"></i>
+                                <p class="text-muted">Add your achievements in the profile section to display them here.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Certifications Section -->
+                <div class="card mt-4 animate-fade-in gradient-card secondary-card">
+                    <div class="card-header bg-transparent border-bottom-0">
+                        <i class="fas fa-certificate"></i> Certifications
+                    </div>
+                    <div class="card-body">
+                        {% if current_user.profile and current_user.profile.certifications %}
+                            {% set certifications = current_user.profile.certifications.split('\n') %}
+                            {% for certification in certifications %}
+                                {% if certification|trim %}
+                                    <div class="certificate-card">
+                                        <div class="certificate-icon">
+                                            <i class="fas fa-certificate"></i>
+                                        </div>
+                                        <div class="certificate-content">
+                                            <h6 class="certificate-name">{{ certification }}</h6>
+                                            <div class="certificate-issuer">Issuing Organization</div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-3">
+                                <i class="fas fa-certificate fa-3x mb-3 text-muted"></i>
+                                <p class="text-muted">Add your certifications in the profile section to display them here.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-lg-8">
+            <div class="card animate-fade-in gradient-card">
+                <div class="card-header bg-transparent border-bottom-0">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('profile') }}">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form.first_name.label(class="form-label") }}
+                                {% if form.first_name.errors %}
+                                    {{ form.first_name(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.first_name.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.first_name(class="form-control") }}
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6">
+                                {{ form.last_name.label(class="form-label") }}
+                                {% if form.last_name.errors %}
+                                    {{ form.last_name(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.last_name.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.last_name(class="form-control") }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.dob.label(class="form-label") }}
+                            {% if form.dob.errors %}
+                                {{ form.dob(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.dob.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.dob(class="form-control", type="date") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form.institution.label(class="form-label") }}
+                                {% if form.institution.errors %}
+                                    {{ form.institution(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.institution.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.institution(class="form-control") }}
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6">
+                                {{ form.major.label(class="form-label") }}
+                                {% if form.major.errors %}
+                                    {{ form.major(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.major.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.major(class="form-control") }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.bio.label(class="form-label") }}
+                            {% if form.bio.errors %}
+                                {{ form.bio(class="form-control is-invalid", rows=4) }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.bio.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.bio(class="form-control", rows=4) }}
+                            {% endif %}
+                            <div class="form-text">Tell us about yourself, your interests and goals.</div>
+                        </div>
+                        
+                        <h5 class="mt-4 mb-3">Academic Information</h5>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                {{ form.gpa.label(class="form-label") }}
+                                {% if form.gpa.errors %}
+                                    {{ form.gpa(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.gpa.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.gpa(class="form-control") }}
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-4">
+                                {{ form.credits_completed.label(class="form-label") }}
+                                {% if form.credits_completed.errors %}
+                                    {{ form.credits_completed(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.credits_completed.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.credits_completed(class="form-control") }}
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-4">
+                                {{ form.graduation_year.label(class="form-label") }}
+                                {% if form.graduation_year.errors %}
+                                    {{ form.graduation_year(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.graduation_year.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.graduation_year(class="form-control") }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.skills.label(class="form-label") }}
+                            {% if form.skills.errors %}
+                                {{ form.skills(class="form-control is-invalid", rows=3) }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.skills.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.skills(class="form-control", rows=3) }}
+                            {% endif %}
+                            <div class="form-text">List your skills separated by commas (e.g., Python, JavaScript, Data Analysis)</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.achievements.label(class="form-label") }}
+                            {% if form.achievements.errors %}
+                                {{ form.achievements(class="form-control is-invalid", rows=3) }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.achievements.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.achievements(class="form-control", rows=3) }}
+                            {% endif %}
+                            <div class="form-text">List your achievements and certifications</div>
+                        </div>
+                        
+                        <h5 class="mt-4 mb-3">Profile Photo & Social Links</h5>
+                        
+                        <div class="mb-3">
+                            {{ form.profile_picture.label(class="form-label") }}
+                            {% if form.profile_picture.errors %}
+                                {{ form.profile_picture(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.profile_picture.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.profile_picture(class="form-control") }}
+                            {% endif %}
+                            <div class="form-text">Enter a URL to your profile picture</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.github_url.label(class="form-label") }}
+                            {% if form.github_url.errors %}
+                                {{ form.github_url(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.github_url.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.github_url(class="form-control") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.linkedin_url.label(class="form-label") }}
+                            {% if form.linkedin_url.errors %}
+                                {{ form.linkedin_url(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.linkedin_url.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.linkedin_url(class="form-control") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.portfolio_url.label(class="form-label") }}
+                            {% if form.portfolio_url.errors %}
+                                {{ form.portfolio_url(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.portfolio_url.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.portfolio_url(class="form-control") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                {{ form.twitter_url.label(class="form-label") }}
+                                {% if form.twitter_url.errors %}
+                                    {{ form.twitter_url(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.twitter_url.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.twitter_url(class="form-control") }}
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6">
+                                {{ form.instagram_url.label(class="form-label") }}
+                                {% if form.instagram_url.errors %}
+                                    {{ form.instagram_url(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.instagram_url.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.instagram_url(class="form-control") }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

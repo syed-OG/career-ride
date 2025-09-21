@@ -1,0 +1,116 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1 class="page-title">
+            {% if request.endpoint == 'new_career_goal' %}
+                <i class="fas fa-plus-circle me-2"></i> Add Career Goal
+            {% else %}
+                <i class="fas fa-edit me-2"></i> Update Career Goal
+            {% endif %}
+        </h1>
+        <p class="page-subtitle">Set and track your career objectives</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card animate-fade-in">
+                <div class="card-header">
+                    <i class="fas fa-bullseye"></i> Career Goal Details
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.career_path_id.label(class="form-label") }}
+                            {% if form.career_path_id.errors %}
+                                {{ form.career_path_id(class="form-select is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.career_path_id.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.career_path_id(class="form-select") }}
+                            {% endif %}
+                            <div class="form-text">Select a predefined career path or choose "Custom Goal" to create your own</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.custom_title.label(class="form-label") }}
+                            {% if form.custom_title.errors %}
+                                {{ form.custom_title(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.custom_title.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.custom_title(class="form-control") }}
+                            {% endif %}
+                            <div class="form-text">Required if you selected "Custom Goal" above</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {% if form.description.errors %}
+                                {{ form.description(class="form-control is-invalid", rows=4) }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.description.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.description(class="form-control", rows=4) }}
+                            {% endif %}
+                            <div class="form-text">Describe your goal in detail, including specific objectives</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            {{ form.target_date.label(class="form-label") }}
+                            {% if form.target_date.errors %}
+                                {{ form.target_date(class="form-control is-invalid", type="date") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.target_date.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.target_date(class="form-control", type="date") }}
+                            {% endif %}
+                            <div class="form-text">When do you aim to achieve this goal?</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Cancel
+                            </a>
+                            
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4 animate-fade-in">
+                <div class="card-header">
+                    <i class="fas fa-lightbulb"></i> Tips for Setting Effective Career Goals
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li><strong>Be specific:</strong> Clearly define what you want to achieve</li>
+                        <li><strong>Make it measurable:</strong> Include metrics to track your progress</li>
+                        <li><strong>Set a realistic timeline:</strong> Give yourself enough time to achieve your goal</li>
+                        <li><strong>Break it down:</strong> Divide your goal into smaller, manageable steps</li>
+                        <li><strong>Align with your interests:</strong> Choose goals that excite and motivate you</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
